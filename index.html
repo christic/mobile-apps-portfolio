@@ -45,38 +45,65 @@
     </footer>
 
     <script>
+        // Debug function to log errors to the page
+        function debugLog(message, isError = false) {
+            console.log(message);
+            const debugDiv = document.getElementById('debug-info') || (() => {
+                const div = document.createElement('div');
+                div.id = 'debug-info';
+                div.style.position = 'fixed';
+                div.style.top = '0';
+                div.style.left = '0';
+                div.style.background = 'rgba(0,0,0,0.8)';
+                div.style.color = 'white';
+                div.style.padding = '10px';
+                div.style.zIndex = '9999';
+                document.body.appendChild(div);
+                return div;
+            })();
+            
+            const logEntry = document.createElement('div');
+            logEntry.textContent = message;
+            logEntry.style.color = isError ? 'red' : 'white';
+            debugDiv.appendChild(logEntry);
+        }
+
         // Load app data and generate cards
-        console.log('Starting to load app data...');
+        debugLog('Starting to load app data...');
+        
+        // First check if the file exists
         fetch('app_data.json')
             .then(response => {
-                console.log('Response status:', response.status);
+                debugLog(`Response status: ${response.status}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Loaded app data:', data);
+                debugLog('Successfully loaded app data');
+                debugLog(`Number of apps: ${data.apps ? data.apps.length : 0}`);
+                
                 const appsSection = document.getElementById('apps');
                 if (!appsSection) {
-                    console.error('Could not find apps section!');
+                    debugLog('Could not find apps section!', true);
                     return;
                 }
 
                 if (!data.apps || data.apps.length === 0) {
-                    console.error('No apps found in data');
+                    debugLog('No apps found in data', true);
                     appsSection.innerHTML = '<p class="error">No apps available at this time.</p>';
                     return;
                 }
 
                 data.apps.forEach(app => {
-                    console.log('Processing app:', app.name);
+                    debugLog(`Processing app: ${app.name}`);
                     const appCard = document.createElement('div');
                     appCard.className = 'app-card';
                     
                     // Check if image exists
                     const imagePath = `images/${app.filename}.png`;
-                    console.log('Checking image path:', imagePath);
+                    debugLog(`Checking image path: ${imagePath}`);
                     
                     appCard.innerHTML = `
                         <div class="app-header">
@@ -153,7 +180,7 @@
                 }
             })
             .catch(error => {
-                console.error('Error loading app data:', error);
+                debugLog(`Error loading app data: ${error.message}`, true);
                 const appsSection = document.getElementById('apps');
                 if (appsSection) {
                     appsSection.innerHTML = '<p class="error">Error loading app data. Please try refreshing the page.</p>';

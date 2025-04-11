@@ -34,12 +34,16 @@ def download_image(url, filename):
         # Clean the URL
         url = url.replace('&amp;', '&')
         
+        print(f"Downloading image from {url} to {filename}.png")
         response = requests.get(url)
         if response.status_code == 200:
             image_path = os.path.join(IMAGES_DIR, f'{filename}.png')
             with open(image_path, 'wb') as f:
                 f.write(response.content)
+            print(f"Successfully downloaded {filename}.png")
             return True
+        else:
+            print(f"Failed to download {filename}.png: HTTP {response.status_code}")
     except Exception as e:
         print(f"Error downloading image for {filename}: {str(e)}")
     return False
@@ -97,6 +101,10 @@ def update_app_data():
             '6741855207': {  # Zing Txt
                 'name': 'Zing Txt',
                 'filename': 'zing-txt'
+            },
+            '6478002011': {  # Tap & Tell Fun
+                'name': 'Tap & Tell Fun',
+                'filename': 'tap-tell-fun'
             }
         }
         
