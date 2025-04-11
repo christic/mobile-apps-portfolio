@@ -10,20 +10,34 @@ IMAGES_DIR = 'images'
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
 def load_app_data():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r') as f:
-            return json.load(f)
+    try:
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading app data: {str(e)}")
     return {"apps": []}
 
 def save_app_data(data):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f, indent=4)
+    try:
+        with open(DATA_FILE, 'w') as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        print(f"Error saving app data: {str(e)}")
+        raise
 
 def download_image(url, filename):
     try:
+        # Ensure images directory exists
+        os.makedirs(IMAGES_DIR, exist_ok=True)
+        
+        # Clean the URL
+        url = url.replace('&amp;', '&')
+        
         response = requests.get(url)
         if response.status_code == 200:
-            with open(f'{IMAGES_DIR}/{filename}.png', 'wb') as f:
+            image_path = os.path.join(IMAGES_DIR, f'{filename}.png')
+            with open(image_path, 'wb') as f:
                 f.write(response.content)
             return True
     except Exception as e:
@@ -69,61 +83,65 @@ def get_app_info(app_id):
     return None
 
 def update_app_data():
-    data = load_app_data()
-    updated = False
-    
-    # Download App Store badge
-    app_store_badge_url = "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1276560000&h=7e7b68fad197e508f92cb1ecd82d8d23"
-    if download_image(app_store_badge_url, 'app-store-badge'):
-        print("Downloaded App Store badge")
-    
-    # App IDs from App Store
-    apps_info = {
-        '6741855207': {  # Zing Txt
-            'name': 'Zing Txt',
-            'filename': 'zing-txt'
-        }
-    }
-    
-    # Remove any duplicate entries
-    seen_ids = set()
-    data['apps'] = [app for app in data['apps'] if not (app['id'] in seen_ids or seen_ids.add(app['id']))]
-    
-    # Update or add apps
-    for app_id, app_data in apps_info.items():
-        print(f"\nUpdating {app_data['name']}...")
-        app_info = get_app_info(app_id)
+    try:
+        data = load_app_data()
+        updated = False
         
-        if app_info:
-            # Find existing app or create new one
-            existing_app = next((app for app in data['apps'] if app['id'] == app_id), None)
-            if existing_app:
-                app = existing_app
+        # Download App Store badge
+        app_store_badge_url = "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1276560000&h=7e7b68fad197e508f92cb1ecd82d8d23"
+        if download_image(app_store_badge_url, 'app-store-badge'):
+            print("Downloaded App Store badge")
+        
+        # App IDs from App Store
+        apps_info = {
+            '6741855207': {  # Zing Txt
+                'name': 'Zing Txt',
+                'filename': 'zing-txt'
+            }
+        }
+        
+        # Remove any duplicate entries
+        seen_ids = set()
+        data['apps'] = [app for app in data['apps'] if not (app['id'] in seen_ids or seen_ids.add(app['id']))]
+        
+        # Update or add apps
+        for app_id, app_data in apps_info.items():
+            print(f"\nUpdating {app_data['name']}...")
+            app_info = get_app_info(app_id)
+            
+            if app_info:
+                # Find existing app or create new one
+                existing_app = next((app for app in data['apps'] if app['id'] == app_id), None)
+                if existing_app:
+                    app = existing_app
+                else:
+                    app = {
+                        'id': app_id,
+                        'name': app_data['name'],
+                        'filename': app_data['filename']
+                    }
+                    data['apps'].append(app)
+                
+                # Update app information
+                app.update(app_info)
+                
+                # Download new icon if needed
+                if download_image(app_info['icon_url'], app['filename']):
+                    print(f"Downloaded new icon for {app['name']}")
+                
+                updated = True
+                print(f"Successfully updated {app['name']}")
             else:
-                app = {
-                    'id': app_id,
-                    'name': app_data['name'],
-                    'filename': app_data['filename']
-                }
-                data['apps'].append(app)
-            
-            # Update app information
-            app.update(app_info)
-            
-            # Download new icon if needed
-            if download_image(app_info['icon_url'], app['filename']):
-                print(f"Downloaded new icon for {app['name']}")
-            
-            updated = True
-            print(f"Successfully updated {app['name']}")
+                print(f"Failed to update {app_data['name']}")
+        
+        if updated:
+            save_app_data(data)
+            print("\nApp data updated successfully!")
         else:
-            print(f"Failed to update {app_data['name']}")
-    
-    if updated:
-        save_app_data(data)
-        print("\nApp data updated successfully!")
-    else:
-        print("\nNo updates were made.")
+            print("\nNo updates were made.")
+    except Exception as e:
+        print(f"Error in update_app_data: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     update_app_data() 
