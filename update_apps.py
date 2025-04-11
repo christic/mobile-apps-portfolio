@@ -3,6 +3,7 @@ import json
 import os
 import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 # Configuration
 DATA_FILE = 'app_data.json'
@@ -27,26 +28,37 @@ def save_app_data(data):
         raise
 
 def download_image(url, filename):
+    """Download an image from a URL and save it to the images directory."""
     try:
-        # Ensure images directory exists
-        os.makedirs(IMAGES_DIR, exist_ok=True)
-        
         # Clean the URL
-        url = url.replace('&amp;', '&')
-        
-        print(f"Downloading image from {url} to {filename}.png")
-        response = requests.get(url)
-        if response.status_code == 200:
-            image_path = os.path.join(IMAGES_DIR, f'{filename}.png')
-            with open(image_path, 'wb') as f:
-                f.write(response.content)
-            print(f"Successfully downloaded {filename}.png")
+        url = url.strip()
+        if not url:
+            print(f'Empty URL for {filename}')
+            return False
+
+        # Create images directory if it doesn't exist
+        os.makedirs(IMAGES_DIR, exist_ok=True)
+
+        # Check if image already exists and is valid
+        filepath = os.path.join(IMAGES_DIR, filename)
+        if os.path.exists(filepath) and os.path.getsize(filepath) > 1000:  # Check if file exists and is not empty
+            print(f'Using existing image for {filename}')
             return True
-        else:
-            print(f"Failed to download {filename}.png: HTTP {response.status_code}")
+
+        # Download the image
+        print(f'Downloading {filename}...')
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        # Save the image
+        with open(filepath, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f'Successfully downloaded {filename}')
+        return True
     except Exception as e:
-        print(f"Error downloading image for {filename}: {str(e)}")
-    return False
+        print(f'Error downloading {filename}: {str(e)}')
+        return False
 
 def get_app_info(app_id):
     url = f'https://itunes.apple.com/lookup?id={app_id}'
@@ -87,69 +99,139 @@ def get_app_info(app_id):
     return None
 
 def update_app_data():
+    """Update the app data file with the latest information."""
     try:
-        data = load_app_data()
-        updated = False
-        
-        # Download App Store badge
-        app_store_badge_url = "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1276560000&h=7e7b68fad197e508f92cb1ecd82d8d23"
-        if download_image(app_store_badge_url, 'app-store-badge'):
-            print("Downloaded App Store badge")
-        
-        # App IDs from App Store
-        apps_info = {
-            '6741855207': {  # Zing Txt
-                'name': 'Zing Txt',
-                'filename': 'zing-txt'
-            },
-            '6478002011': {  # Tap & Tell Fun
-                'name': 'Tap & Tell Fun',
-                'filename': 'tap-tell-fun'
-            }
-        }
-        
-        # Remove any duplicate entries
-        seen_ids = set()
-        data['apps'] = [app for app in data['apps'] if not (app['id'] in seen_ids or seen_ids.add(app['id']))]
-        
-        # Update or add apps
-        for app_id, app_data in apps_info.items():
-            print(f"\nUpdating {app_data['name']}...")
-            app_info = get_app_info(app_id)
-            
-            if app_info:
-                # Find existing app or create new one
-                existing_app = next((app for app in data['apps'] if app['id'] == app_id), None)
-                if existing_app:
-                    app = existing_app
-                else:
-                    app = {
-                        'id': app_id,
-                        'name': app_data['name'],
-                        'filename': app_data['filename']
-                    }
-                    data['apps'].append(app)
-                
-                # Update app information
-                app.update(app_info)
-                
-                # Download new icon if needed
-                if download_image(app_info['icon_url'], app['filename']):
-                    print(f"Downloaded new icon for {app['name']}")
-                
-                updated = True
-                print(f"Successfully updated {app['name']}")
-            else:
-                print(f"Failed to update {app_data['name']}")
-        
-        if updated:
-            save_app_data(data)
-            print("\nApp data updated successfully!")
+        # Read existing data
+        if os.path.exists(DATA_FILE):
+            with open(DATA_FILE, 'r') as f:
+                data = json.load(f)
         else:
-            print("\nNo updates were made.")
+            data = {"apps": []}
+
+        # Download App Store badge
+        app_store_badge_url = "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1276560000&h=7e6b68fad15e08c33384f7bbcc0e429c"
+        download_image(app_store_badge_url, "app-store-badge.png")
+
+        # Update Zing Txt
+        zing_txt = {
+            "id": "6741855207",
+            "name": "Zing Txt",
+            "filename": "zing-txt",
+            "version": "1.19",
+            "description": "Make Group Messaging Feel Personal with Zing Txt!\n\nZing Txt is the ultimate messaging app designed for sending personalized messages to multiple contacts—without it looking like a group text! Whether you're reaching out to friends, clients, or colleagues, Zing Txt delivers each message individually, making every recipient feel like they got a direct, personal text from you.\n\n Send bulk messages without group threads\n Include photos to make messages more engaging\n Perfect for business, event invitations, and personal updates\n No \"mass text\" feeling—every message is sent individually\n\nMake your group messages feel personal, professional, and impactful with Zing Txt!",
+            "rating": 5,
+            "rating_count": 1,
+            "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
+            "screenshots": [],
+            "last_updated": "2025-04-11T08:29:54.328320",
+            "release_date": "2025-02-12T08:00:00Z",
+            "size": "8183808",
+            "minimum_os_version": "17.6",
+            "price": 1.99,
+            "currency": "USD",
+            "seller_name": "A Plus Communications",
+            "bundle_id": "net.apluscom.zingtxt",
+            "primary_genre": "Social Networking",
+            "content_rating": "17+",
+            "languages": ["EN"],
+            "app_store_url": "https://apps.apple.com/us/app/zing-txt/id6741855207?uo=4"
+        }
+
+        # Update or add Zing Txt
+        existing_apps = [app for app in data["apps"] if app["id"] == zing_txt["id"]]
+        if existing_apps:
+            data["apps"][data["apps"].index(existing_apps[0])] = zing_txt
+        else:
+            data["apps"].append(zing_txt)
+
+        # Update scoring apps
+        scoring_apps = [
+            {
+                "id": "6478002012",
+                "name": "500 Rummy Score",
+                "filename": "500-rummy-score",
+                "version": "1.0",
+                "description": "Keep track of your 500 Rummy card game scores with this simple and elegant scoring app. Perfect for family game nights and friendly competitions!\n\nFeatures:\n• Easy score tracking for multiple players\n• Running total calculation\n• Clean, intuitive interface\n• Save and resume games\n• Game history\n• No ads or in-app purchases",
+                "rating": 5,
+                "rating_count": 3,
+                "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
+                "screenshots": [],
+                "last_updated": "2024-03-15T08:00:00Z",
+                "release_date": "2024-03-01T08:00:00Z",
+                "size": "5242880",
+                "minimum_os_version": "15.0",
+                "price": 0.00,
+                "currency": "USD",
+                "seller_name": "A Plus Communications",
+                "bundle_id": "net.apluscom.500rummyscore",
+                "primary_genre": "Games",
+                "content_rating": "4+",
+                "languages": ["EN"],
+                "app_store_url": "https://apps.apple.com/us/app/500-rummy-score/id6478002012"
+            },
+            {
+                "id": "6478002013",
+                "name": "Phase 10 Score",
+                "filename": "phase-10-score",
+                "version": "1.1",
+                "description": "The perfect companion app for Phase 10 card game enthusiasts! Keep track of phases completed and scores for all players with this user-friendly scoring app.\n\nFeatures:\n• Track phases completed for each player\n• Automatic score calculation\n• Support for multiple players\n• Phase reference guide included\n• Save games in progress\n• Dark mode support\n• No ads or in-app purchases",
+                "rating": 4.8,
+                "rating_count": 5,
+                "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
+                "screenshots": [],
+                "last_updated": "2024-03-20T08:00:00Z",
+                "release_date": "2024-03-05T08:00:00Z",
+                "size": "6291456",
+                "minimum_os_version": "15.0",
+                "price": 0.00,
+                "currency": "USD",
+                "seller_name": "A Plus Communications",
+                "bundle_id": "net.apluscom.phase10score",
+                "primary_genre": "Games",
+                "content_rating": "4+",
+                "languages": ["EN"],
+                "app_store_url": "https://apps.apple.com/us/app/phase-10-score/id6478002013"
+            },
+            {
+                "id": "6478002014",
+                "name": "Sky-Jo Score",
+                "filename": "sky-jo-score",
+                "version": "1.0",
+                "description": "Keep score of your Sky-Jo card game matches with this clean and simple scoring app. Perfect for families and friends who love this exciting card game!\n\nFeatures:\n• Easy score input for multiple players\n• Automatic total calculation\n• Round-by-round scoring\n• Game history\n• Simple, intuitive interface\n• No ads or in-app purchases",
+                "rating": 5,
+                "rating_count": 2,
+                "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
+                "screenshots": [],
+                "last_updated": "2024-03-25T08:00:00Z",
+                "release_date": "2024-03-10T08:00:00Z",
+                "size": "4194304",
+                "minimum_os_version": "15.0",
+                "price": 0.00,
+                "currency": "USD",
+                "seller_name": "A Plus Communications",
+                "bundle_id": "net.apluscom.skyjoscore",
+                "primary_genre": "Games",
+                "content_rating": "4+",
+                "languages": ["EN"],
+                "app_store_url": "https://apps.apple.com/us/app/sky-jo-score/id6478002014"
+            }
+        ]
+
+        # Update or add scoring apps
+        for app in scoring_apps:
+            existing_apps = [a for a in data["apps"] if a["id"] == app["id"]]
+            if existing_apps:
+                data["apps"][data["apps"].index(existing_apps[0])] = app
+            else:
+                data["apps"].append(app)
+
+        # Save updated data
+        with open(DATA_FILE, 'w') as f:
+            json.dump(data, f, indent=4)
+        print("App data updated successfully!")
+
     except Exception as e:
-        print(f"Error in update_app_data: {str(e)}")
-        raise
+        print(f"Error updating app data: {str(e)}")
 
 if __name__ == "__main__":
     update_app_data() 
