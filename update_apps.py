@@ -46,7 +46,23 @@ def get_app_info(app_id):
                 'rating_count': app.get('userRatingCount', 0),
                 'icon_url': app['artworkUrl512'],
                 'screenshots': app.get('screenshotUrls', []),
-                'last_updated': datetime.datetime.now().isoformat()
+                'last_updated': datetime.datetime.now().isoformat(),
+                # Additional App Store information
+                'release_date': app.get('releaseDate'),
+                'size': app.get('fileSizeBytes'),
+                'minimum_os_version': app.get('minimumOsVersion'),
+                'supported_devices': app.get('supportedDevices', []),
+                'genres': app.get('genres', []),
+                'price': app.get('price', 0),
+                'currency': app.get('currency'),
+                'seller_name': app.get('sellerName'),
+                'bundle_id': app.get('bundleId'),
+                'primary_genre': app.get('primaryGenreName'),
+                'content_rating': app.get('contentAdvisoryRating'),
+                'languages': app.get('languageCodesISO2A', []),
+                'current_version_release_date': app.get('currentVersionReleaseDate'),
+                'release_notes': app.get('releaseNotes'),
+                'app_store_url': app.get('trackViewUrl')
             }
     except Exception as e:
         print(f"Error fetching app info for ID {app_id}: {str(e)}")
@@ -56,18 +72,43 @@ def update_app_data():
     data = load_app_data()
     updated = False
     
-    for app in data['apps']:
-        print(f"\nUpdating {app['name']}...")
-        app_info = get_app_info(app['id'])
+    # Download App Store badge
+    app_store_badge_url = "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1276560000&h=7e7b68fad197e508f92cb1ecd82d8d23"
+    if download_image(app_store_badge_url, 'app-store-badge'):
+        print("Downloaded App Store badge")
+    
+    # App IDs from App Store
+    apps_info = {
+        '6741855207': {  # Zing Txt
+            'name': 'Zing Txt',
+            'filename': 'zing-txt'
+        }
+    }
+    
+    # Remove any duplicate entries
+    seen_ids = set()
+    data['apps'] = [app for app in data['apps'] if not (app['id'] in seen_ids or seen_ids.add(app['id']))]
+    
+    # Update or add apps
+    for app_id, app_data in apps_info.items():
+        print(f"\nUpdating {app_data['name']}...")
+        app_info = get_app_info(app_id)
         
         if app_info:
+            # Find existing app or create new one
+            existing_app = next((app for app in data['apps'] if app['id'] == app_id), None)
+            if existing_app:
+                app = existing_app
+            else:
+                app = {
+                    'id': app_id,
+                    'name': app_data['name'],
+                    'filename': app_data['filename']
+                }
+                data['apps'].append(app)
+            
             # Update app information
-            app['version'] = app_info['version']
-            app['description'] = app_info['description']
-            app['rating'] = app_info['rating']
-            app['rating_count'] = app_info['rating_count']
-            app['last_updated'] = app_info['last_updated']
-            app['screenshots'] = app_info['screenshots']
+            app.update(app_info)
             
             # Download new icon if needed
             if download_image(app_info['icon_url'], app['filename']):
@@ -76,7 +117,7 @@ def update_app_data():
             updated = True
             print(f"Successfully updated {app['name']}")
         else:
-            print(f"Failed to update {app['name']}")
+            print(f"Failed to update {app_data['name']}")
     
     if updated:
         save_app_data(data)

@@ -6,7 +6,6 @@
     <title>Mobile Apps by Clarence</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <base href="/mobile-apps-portfolio/">
 </head>
 <body>
     <header>
@@ -48,35 +47,86 @@
     <script>
         // Load app data and generate cards
         fetch('app_data.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Loaded app data:', data); // Debug log
                 const appsSection = document.getElementById('apps');
+                if (!appsSection) {
+                    console.error('Could not find apps section!');
+                    return;
+                }
+
                 data.apps.forEach(app => {
+                    console.log('Processing app:', app.name); // Debug log
                     const appCard = document.createElement('div');
                     appCard.className = 'app-card';
                     appCard.innerHTML = `
-                        <h2>${app.name}</h2>
-                        <div class="app-content">
-                            <div class="app-image">
-                                <img src="images/${app.filename}.png" alt="${app.name} Screenshot">
-                            </div>
-                            <div class="app-info">
+                        <div class="app-header">
+                            <img src="images/${app.filename}.png" alt="${app.name} icon" class="app-icon">
+                            <div class="app-title">
+                                <h3>${app.name}</h3>
                                 <div class="app-meta">
-                                    <span class="version">Version ${app.version}</span>
-                                    <span class="rating">
-                                        <i class="fas fa-star"></i> ${app.rating.toFixed(1)} (${app.rating_count} ratings)
-                                    </span>
+                                    <span class="version">${app.version ? `v${app.version}` : ''}</span>
+                                    <span class="rating">${app.rating ? `${app.rating.toFixed(1)} ⭐ (${app.rating_count} reviews)` : ''}</span>
                                 </div>
-                                <p>${app.description}</p>
-                                <div class="app-screenshots">
-                                    ${app.screenshots.map(url => `
-                                        <img src="${url}" alt="${app.name} Screenshot">
+                            </div>
+                        </div>
+                        <div class="app-details">
+                            <p class="description">${app.description || ''}</p>
+                            ${app.release_date ? `
+                            <div class="app-info-grid">
+                                <div class="info-item">
+                                    <span class="label">Release Date</span>
+                                    <span class="value">${new Date(app.release_date).toLocaleDateString()}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Size</span>
+                                    <span class="value">${app.size ? `${(parseInt(app.size) / (1024 * 1024)).toFixed(1)} MB` : 'N/A'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Minimum iOS</span>
+                                    <span class="value">${app.minimum_os_version || 'N/A'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Price</span>
+                                    <span class="value">${app.price > 0 ? `$${app.price} ${app.currency}` : 'Free'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Genre</span>
+                                    <span class="value">${app.primary_genre || 'N/A'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Content Rating</span>
+                                    <span class="value">${app.content_rating || 'N/A'}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${app.screenshots && app.screenshots.length > 0 ? `
+                            <div class="screenshots">
+                                <h4>Screenshots</h4>
+                                <div class="screenshot-grid">
+                                    ${app.screenshots.map(screenshot => `
+                                        <img src="${screenshot}" alt="${app.name} screenshot" class="screenshot">
                                     `).join('')}
                                 </div>
-                                <a href="https://apps.apple.com/us/app/${app.filename}/id${app.id}" class="app-store-button">
-                                    <i class="fab fa-apple"></i> Download on App Store
-                                </a>
                             </div>
+                            ` : ''}
+                            ${app.release_notes ? `
+                            <div class="release-notes">
+                                <h4>What's New in v${app.version}</h4>
+                                <p>${app.release_notes}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="app-footer">
+                            <a href="${app.app_store_url || '#'}" class="app-store-button" target="_blank">
+                                <img src="images/app-store-badge.png" alt="Download on the App Store">
+                            </a>
                         </div>
                     `;
                     appsSection.appendChild(appCard);
@@ -84,9 +134,18 @@
 
                 // Update last updated time
                 const lastUpdated = new Date(data.apps[0]?.last_updated || new Date());
-                document.getElementById('last-updated-time').textContent = lastUpdated.toLocaleString();
+                const lastUpdatedElement = document.getElementById('last-updated-time');
+                if (lastUpdatedElement) {
+                    lastUpdatedElement.textContent = lastUpdated.toLocaleString();
+                }
             })
-            .catch(error => console.error('Error loading app data:', error));
+            .catch(error => {
+                console.error('Error loading app data:', error);
+                const appsSection = document.getElementById('apps');
+                if (appsSection) {
+                    appsSection.innerHTML = '<p class="error">Error loading app data. Please try refreshing the page.</p>';
+                }
+            });
     </script>
 </body>
 </html> 

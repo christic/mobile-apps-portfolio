@@ -83,94 +83,147 @@ main {
 
 .app-card {
     background: white;
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease;
 }
 
 .app-card:hover {
     transform: translateY(-5px);
 }
 
-.app-card h2 {
-    color: #007AFF;
-    margin-bottom: 1rem;
-}
-
-.app-content {
+.app-header {
     display: flex;
-    gap: 2rem;
-    align-items: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.app-image {
-    flex: 1;
-    min-width: 200px;
+.app-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    margin-right: 15px;
+    object-fit: cover;
 }
 
-.app-image img {
-    width: 100%;
-    max-width: 300px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.app-info {
-    flex: 2;
+.app-title h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
 }
 
 .app-meta {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 15px;
+    margin-top: 5px;
     color: #666;
-    font-size: 0.9rem;
+    font-size: 14px;
 }
 
-.version {
-    background: #f0f0f0;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
+.app-details {
+    margin: 20px 0;
 }
 
-.rating {
+.description {
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.app-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.info-item {
     display: flex;
-    align-items: center;
-    gap: 0.3rem;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.rating i {
-    color: #FFD700;
+.info-item .label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
 }
 
-.app-screenshots {
-    display: flex;
-    gap: 1rem;
-    margin: 1rem 0;
-    overflow-x: auto;
-    padding-bottom: 1rem;
+.info-item .value {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
 }
 
-.app-screenshots img {
-    height: 300px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.screenshots {
+    margin: 20px 0;
+}
+
+.screenshots h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.screenshot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+    justify-items: center;
+}
+
+.screenshot {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.screenshot:hover {
+    transform: scale(1.02);
+}
+
+.release-notes {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.release-notes h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.release-notes p {
+    color: #444;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.app-footer {
+    margin-top: 20px;
+    text-align: center;
 }
 
 .app-store-button {
     display: inline-block;
-    background-color: #007AFF;
-    color: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 25px;
-    text-decoration: none;
-    margin-top: 1rem;
-    transition: background-color 0.3s;
 }
 
-.app-store-button:hover {
-    background-color: #0056b3;
+.app-store-button img {
+    height: 40px;
+    transition: transform 0.3s ease;
+}
+
+.app-store-button:hover img {
+    transform: scale(1.05);
 }
 
 /* Support section styles */
@@ -213,29 +266,29 @@ footer {
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .app-content {
+    .app-header {
         flex-direction: column;
+        text-align: center;
     }
-    
-    .app-image {
-        margin-bottom: 1rem;
+
+    .app-icon {
+        margin: 0 0 15px 0;
     }
-    
+
+    .app-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .screenshot-grid {
+        grid-template-columns: 1fr;
+    }
+
     .hero h1 {
         font-size: 2rem;
     }
     
     .nav-links {
         gap: 1rem;
-    }
-
-    .app-screenshots {
-        flex-direction: column;
-    }
-
-    .app-screenshots img {
-        width: 100%;
-        height: auto;
     }
 }
 

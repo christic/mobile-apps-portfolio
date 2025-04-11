@@ -10,4 +10,7 @@ curl -o images/sky-jo-score.png "https://is1-ssl.mzstatic.com/image/thumb/Purple
 curl -o images/500-rummy-score.png "https://is1-ssl.mzstatic.com/image/thumb/Purple116/v4/8a/8b/8a/8a8b8a8a-8a8b-8a8b-8a8b-8a8b8a8b8a8b/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/1200x630wa.png"
 curl -o images/zing-txt.png "https://is1-ssl.mzstatic.com/image/thumb/Purple116/v4/8a/8b/8a/8a8b8a8a-8a8b-8a8b-8a8b-8a8b8a8b8a8b/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/1200x630wa.png"
 
+# Download App Store badge
+curl -o images/app-store-badge.png https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83
+
 echo "Images downloaded successfully!" 
