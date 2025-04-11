@@ -113,117 +113,38 @@ def update_app_data():
         download_image(app_store_badge_url, "app-store-badge.png")
 
         # Update Zing Txt
-        zing_txt = {
-            "id": "6741855207",
-            "name": "Zing Txt",
-            "filename": "zing-txt",
-            "version": "1.19",
-            "description": "Make Group Messaging Feel Personal with Zing Txt!\n\nZing Txt is the ultimate messaging app designed for sending personalized messages to multiple contacts—without it looking like a group text! Whether you're reaching out to friends, clients, or colleagues, Zing Txt delivers each message individually, making every recipient feel like they got a direct, personal text from you.\n\n Send bulk messages without group threads\n Include photos to make messages more engaging\n Perfect for business, event invitations, and personal updates\n No \"mass text\" feeling—every message is sent individually\n\nMake your group messages feel personal, professional, and impactful with Zing Txt!",
-            "rating": 5,
-            "rating_count": 1,
-            "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
-            "screenshots": [],
-            "last_updated": "2025-04-11T08:29:54.328320",
-            "release_date": "2025-02-12T08:00:00Z",
-            "size": "8183808",
-            "minimum_os_version": "17.6",
-            "price": 1.99,
-            "currency": "USD",
-            "seller_name": "A Plus Communications",
-            "bundle_id": "net.apluscom.zingtxt",
-            "primary_genre": "Social Networking",
-            "content_rating": "17+",
-            "languages": ["EN"],
-            "app_store_url": "https://apps.apple.com/us/app/zing-txt/id6741855207?uo=4"
-        }
-
-        # Update or add Zing Txt
-        existing_apps = [app for app in data["apps"] if app["id"] == zing_txt["id"]]
-        if existing_apps:
-            data["apps"][data["apps"].index(existing_apps[0])] = zing_txt
-        else:
-            data["apps"].append(zing_txt)
+        zing_txt_info = get_app_info("6741855207")
+        if zing_txt_info:
+            zing_txt = {
+                "id": "6741855207",
+                "name": "Zing Txt",
+                "filename": "zing-txt",
+                **zing_txt_info
+            }
+            # Update or add Zing Txt
+            existing_apps = [app for app in data["apps"] if app["id"] == zing_txt["id"]]
+            if existing_apps:
+                data["apps"][data["apps"].index(existing_apps[0])] = zing_txt
+            else:
+                data["apps"].append(zing_txt)
 
         # Update scoring apps
-        scoring_apps = [
-            {
-                "id": "6478002012",
-                "name": "500 Rummy Score",
-                "filename": "500-rummy-score",
-                "version": "1.0",
-                "description": "Keep track of your 500 Rummy card game scores with this simple and elegant scoring app. Perfect for family game nights and friendly competitions!\n\nFeatures:\n• Easy score tracking for multiple players\n• Running total calculation\n• Clean, intuitive interface\n• Save and resume games\n• Game history\n• No ads or in-app purchases",
-                "rating": 5,
-                "rating_count": 3,
-                "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
-                "screenshots": [],
-                "last_updated": "2024-03-15T08:00:00Z",
-                "release_date": "2024-03-01T08:00:00Z",
-                "size": "5242880",
-                "minimum_os_version": "15.0",
-                "price": 0.00,
-                "currency": "USD",
-                "seller_name": "A Plus Communications",
-                "bundle_id": "net.apluscom.500rummyscore",
-                "primary_genre": "Games",
-                "content_rating": "4+",
-                "languages": ["EN"],
-                "app_store_url": "https://apps.apple.com/us/app/500-rummy-score/id6478002012"
-            },
-            {
-                "id": "6478002013",
-                "name": "Phase 10 Score",
-                "filename": "phase-10-score",
-                "version": "1.1",
-                "description": "The perfect companion app for Phase 10 card game enthusiasts! Keep track of phases completed and scores for all players with this user-friendly scoring app.\n\nFeatures:\n• Track phases completed for each player\n• Automatic score calculation\n• Support for multiple players\n• Phase reference guide included\n• Save games in progress\n• Dark mode support\n• No ads or in-app purchases",
-                "rating": 4.8,
-                "rating_count": 5,
-                "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
-                "screenshots": [],
-                "last_updated": "2024-03-20T08:00:00Z",
-                "release_date": "2024-03-05T08:00:00Z",
-                "size": "6291456",
-                "minimum_os_version": "15.0",
-                "price": 0.00,
-                "currency": "USD",
-                "seller_name": "A Plus Communications",
-                "bundle_id": "net.apluscom.phase10score",
-                "primary_genre": "Games",
-                "content_rating": "4+",
-                "languages": ["EN"],
-                "app_store_url": "https://apps.apple.com/us/app/phase-10-score/id6478002013"
-            },
-            {
-                "id": "6478002014",
-                "name": "Sky-Jo Score",
-                "filename": "sky-jo-score",
-                "version": "1.0",
-                "description": "Keep score of your Sky-Jo card game matches with this clean and simple scoring app. Perfect for families and friends who love this exciting card game!\n\nFeatures:\n• Easy score input for multiple players\n• Automatic total calculation\n• Round-by-round scoring\n• Game history\n• Simple, intuitive interface\n• No ads or in-app purchases",
-                "rating": 5,
-                "rating_count": 2,
-                "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/97/34/fe9734a0-4b9a-9575-e8ce-dbc636d62c54/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/512x512bb.jpg",
-                "screenshots": [],
-                "last_updated": "2024-03-25T08:00:00Z",
-                "release_date": "2024-03-10T08:00:00Z",
-                "size": "4194304",
-                "minimum_os_version": "15.0",
-                "price": 0.00,
-                "currency": "USD",
-                "seller_name": "A Plus Communications",
-                "bundle_id": "net.apluscom.skyjoscore",
-                "primary_genre": "Games",
-                "content_rating": "4+",
-                "languages": ["EN"],
-                "app_store_url": "https://apps.apple.com/us/app/sky-jo-score/id6478002014"
-            }
-        ]
-
-        # Update or add scoring apps
-        for app in scoring_apps:
-            existing_apps = [a for a in data["apps"] if a["id"] == app["id"]]
-            if existing_apps:
-                data["apps"][data["apps"].index(existing_apps[0])] = app
-            else:
-                data["apps"].append(app)
+        scoring_app_ids = ["6478002012", "6478002013", "6478002014"]
+        for app_id in scoring_app_ids:
+            app_info = get_app_info(app_id)
+            if app_info:
+                app = {
+                    "id": app_id,
+                    "name": app_info["name"],
+                    "filename": app_info["name"].lower().replace(" ", "-"),
+                    **app_info
+                }
+                # Update or add app
+                existing_apps = [a for a in data["apps"] if a["id"] == app["id"]]
+                if existing_apps:
+                    data["apps"][data["apps"].index(existing_apps[0])] = app
+                else:
+                    data["apps"].append(app)
 
         # Save updated data
         with open(DATA_FILE, 'w') as f:
