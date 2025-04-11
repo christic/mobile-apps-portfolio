@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Apps by Clarence</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Mobile Apps</div>
+            <ul class="nav-links">
+                <li><a href="#apps">Apps</a></li>
+                <li><a href="#support">Support</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Welcome to My App Portfolio</h1>
+            <p>Discover and download my collection of fun and useful mobile games</p>
+        </section>
+
+        <section id="apps" class="apps-section">
+            <!-- App cards will be dynamically loaded here -->
+        </section>
+
+        <section id="support" class="support-section">
+            <h2>Support</h2>
+            <div class="support-content">
+                <p>Need help with any of my apps? Feel free to reach out!</p>
+                <div class="contact-info">
+                    <p>Email: <a href="mailto:support@example.com">support@example.com</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Mobile Apps by Clarence. All rights reserved.</p>
+        <p class="last-updated">Last updated: <span id="last-updated-time"></span></p>
+    </footer>
+
+    <script>
+        // Load app data and generate cards
+        fetch('app_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const appsSection = document.getElementById('apps');
+                data.apps.forEach(app => {
+                    const appCard = document.createElement('div');
+                    appCard.className = 'app-card';
+                    appCard.innerHTML = `
+                        <h2>${app.name}</h2>
+                        <div class="app-content">
+                            <div class="app-image">
+                                <img src="images/${app.filename}.png" alt="${app.name} Screenshot">
+                            </div>
+                            <div class="app-info">
+                                <div class="app-meta">
+                                    <span class="version">Version ${app.version}</span>
+                                    <span class="rating">
+                                        <i class="fas fa-star"></i> ${app.rating.toFixed(1)} (${app.rating_count} ratings)
+                                    </span>
+                                </div>
+                                <p>${app.description}</p>
+                                <div class="app-screenshots">
+                                    ${app.screenshots.map(url => `
+                                        <img src="${url}" alt="${app.name} Screenshot">
+                                    `).join('')}
+                                </div>
+                                <a href="https://apps.apple.com/us/app/${app.filename}/id${app.id}" class="app-store-button">
+                                    <i class="fab fa-apple"></i> Download on App Store
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    appsSection.appendChild(appCard);
+                });
+
+                // Update last updated time
+                const lastUpdated = new Date(data.apps[0]?.last_updated || new Date());
+                document.getElementById('last-updated-time').textContent = lastUpdated.toLocaleString();
+            })
+            .catch(error => console.error('Error loading app data:', error));
+    </script>
+</body>
+</html> 

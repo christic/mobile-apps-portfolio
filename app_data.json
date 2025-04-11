@@ -1,0 +1,59 @@
+{
+    "apps": [
+        {
+            "id": "6478002011",
+            "name": "Tap & Tell Fun",
+            "filename": "tap-tell-fun",
+            "description": "A fun and interactive game that challenges your memory and reflexes.",
+            "version": "",
+            "rating": 0,
+            "rating_count": 0,
+            "last_updated": "",
+            "screenshots": []
+        },
+        {
+            "id": "6478002011",
+            "name": "Phase 10 Score",
+            "filename": "phase-10-score",
+            "description": "Keep track of your Phase 10 game scores with this easy-to-use scoreboard.",
+            "version": "",
+            "rating": 0,
+            "rating_count": 0,
+            "last_updated": "",
+            "screenshots": []
+        },
+        {
+            "id": "6478002011",
+            "name": "Sky Jo Score Board",
+            "filename": "sky-jo-score",
+            "description": "The perfect companion for your Sky Jo card game sessions.",
+            "version": "",
+            "rating": 0,
+            "rating_count": 0,
+            "last_updated": "",
+            "screenshots": []
+        },
+        {
+            "id": "6478002011",
+            "name": "500 Rummy Score Board",
+            "filename": "500-rummy-score",
+            "description": "Track your 500 Rummy game scores with this intuitive scoreboard app.",
+            "version": "",
+            "rating": 0,
+            "rating_count": 0,
+            "last_updated": "",
+            "screenshots": []
+        },
+        {
+            "id": "6478002011",
+            "name": "Zing Txt",
+            "filename": "zing-txt",
+            "description": "A fun and engaging text-based game that challenges your creativity and quick thinking.",
+            "version": "",
+            "rating": 0,
+            "rating_count": 0,
+            "last_updated": "",
+            "screenshots": []
+        }
+    ]
+} 

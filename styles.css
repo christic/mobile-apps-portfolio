@@ -1,0 +1,255 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Header styles */
+header {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007AFF;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #007AFF;
+}
+
+/* Main content styles */
+main {
+    margin-top: 80px;
+    padding: 2rem;
+}
+
+.hero {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #007AFF, #00BFFF);
+    color: white;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Apps section styles */
+.apps-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    gap: 2rem;
+}
+
+.app-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.app-card:hover {
+    transform: translateY(-5px);
+}
+
+.app-card h2 {
+    color: #007AFF;
+    margin-bottom: 1rem;
+}
+
+.app-content {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.app-image {
+    flex: 1;
+    min-width: 200px;
+}
+
+.app-image img {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.app-info {
+    flex: 2;
+}
+
+.app-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.version {
+    background: #f0f0f0;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.rating i {
+    color: #FFD700;
+}
+
+.app-screenshots {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+}
+
+.app-screenshots img {
+    height: 300px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.app-store-button {
+    display: inline-block;
+    background-color: #007AFF;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+}
+
+.app-store-button:hover {
+    background-color: #0056b3;
+}
+
+/* Support section styles */
+.support-section {
+    max-width: 1200px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.support-section h2 {
+    color: #007AFF;
+    margin-bottom: 1rem;
+}
+
+.contact-info {
+    margin-top: 1rem;
+}
+
+.contact-info a {
+    color: #007AFF;
+    text-decoration: none;
+}
+
+/* Footer styles */
+footer {
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    margin-top: 4rem;
+}
+
+.last-updated {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .app-content {
+        flex-direction: column;
+    }
+    
+    .app-image {
+        margin-bottom: 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .nav-links {
+        gap: 1rem;
+    }
+
+    .app-screenshots {
+        flex-direction: column;
+    }
+
+    .app-screenshots img {
+        width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-links {
+        display: none;
+    }
+    
+    .hero {
+        padding: 2rem 1rem;
+    }
+
+    .app-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+} 
