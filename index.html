@@ -58,6 +58,8 @@
                 div.style.color = 'white';
                 div.style.padding = '10px';
                 div.style.zIndex = '9999';
+                div.style.maxHeight = '200px';
+                div.style.overflow = 'auto';
                 document.body.appendChild(div);
                 return div;
             })();
@@ -65,22 +67,50 @@
             const logEntry = document.createElement('div');
             logEntry.textContent = message;
             logEntry.style.color = isError ? 'red' : 'white';
+            logEntry.style.marginBottom = '5px';
             debugDiv.appendChild(logEntry);
+        }
+
+        // Check if files exist
+        async function checkFileExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                debugLog(`Checking ${url}: ${response.status === 200 ? 'Exists' : 'Missing'}`);
+                return response.status === 200;
+            } catch (error) {
+                debugLog(`Error checking ${url}: ${error.message}`, true);
+                return false;
+            }
         }
 
         // Load app data and generate cards
         debugLog('Starting to load app data...');
         
-        // First check if the file exists
-        fetch('app_data.json')
-            .then(response => {
+        // Check if required files exist
+        Promise.all([
+            checkFileExists('app_data.json'),
+            checkFileExists('styles.css'),
+            checkFileExists('images/app-store-badge.png')
+        ]).then(async ([appDataExists, stylesExists, badgeExists]) => {
+            if (!appDataExists) {
+                debugLog('app_data.json is missing!', true);
+                return;
+            }
+            if (!stylesExists) {
+                debugLog('styles.css is missing!', true);
+                return;
+            }
+            if (!badgeExists) {
+                debugLog('App Store badge is missing!', true);
+            }
+
+            try {
+                const response = await fetch('app_data.json');
                 debugLog(`Response status: ${response.status}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json();
-            })
-            .then(data => {
+                const data = await response.json();
                 debugLog('Successfully loaded app data');
                 debugLog(`Number of apps: ${data.apps ? data.apps.length : 0}`);
                 
@@ -96,14 +126,15 @@
                     return;
                 }
 
-                data.apps.forEach(app => {
+                for (const app of data.apps) {
                     debugLog(`Processing app: ${app.name}`);
                     const appCard = document.createElement('div');
                     appCard.className = 'app-card';
                     
                     // Check if image exists
                     const imagePath = `images/${app.filename}.png`;
-                    debugLog(`Checking image path: ${imagePath}`);
+                    const imageExists = await checkFileExists(imagePath);
+                    debugLog(`Image ${imagePath} exists: ${imageExists}`);
                     
                     appCard.innerHTML = `
                         <div class="app-header">
@@ -170,7 +201,7 @@
                         </div>
                     `;
                     appsSection.appendChild(appCard);
-                });
+                }
 
                 // Update last updated time
                 const lastUpdated = new Date(data.apps[0]?.last_updated || new Date());
@@ -178,14 +209,16 @@
                 if (lastUpdatedElement) {
                     lastUpdatedElement.textContent = lastUpdated.toLocaleString();
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 debugLog(`Error loading app data: ${error.message}`, true);
                 const appsSection = document.getElementById('apps');
                 if (appsSection) {
                     appsSection.innerHTML = '<p class="error">Error loading app data. Please try refreshing the page.</p>';
                 }
-            });
+            }
+        }).catch(error => {
+            debugLog(`Error checking files: ${error.message}`, true);
+        });
     </script>
 </body>
 </html> 
