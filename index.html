@@ -46,28 +46,41 @@
 
     <script>
         // Load app data and generate cards
+        console.log('Starting to load app data...');
         fetch('app_data.json')
             .then(response => {
+                console.log('Response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Loaded app data:', data); // Debug log
+                console.log('Loaded app data:', data);
                 const appsSection = document.getElementById('apps');
                 if (!appsSection) {
                     console.error('Could not find apps section!');
                     return;
                 }
 
+                if (!data.apps || data.apps.length === 0) {
+                    console.error('No apps found in data');
+                    appsSection.innerHTML = '<p class="error">No apps available at this time.</p>';
+                    return;
+                }
+
                 data.apps.forEach(app => {
-                    console.log('Processing app:', app.name); // Debug log
+                    console.log('Processing app:', app.name);
                     const appCard = document.createElement('div');
                     appCard.className = 'app-card';
+                    
+                    // Check if image exists
+                    const imagePath = `images/${app.filename}.png`;
+                    console.log('Checking image path:', imagePath);
+                    
                     appCard.innerHTML = `
                         <div class="app-header">
-                            <img src="images/${app.filename}.png" alt="${app.name} icon" class="app-icon">
+                            <img src="${imagePath}" alt="${app.name} icon" class="app-icon" onerror="this.src='images/default-app-icon.png'">
                             <div class="app-title">
                                 <h3>${app.name}</h3>
                                 <div class="app-meta">
@@ -111,7 +124,7 @@
                                 <h4>Screenshots</h4>
                                 <div class="screenshot-grid">
                                     ${app.screenshots.map(screenshot => `
-                                        <img src="${screenshot}" alt="${app.name} screenshot" class="screenshot">
+                                        <img src="${screenshot}" alt="${app.name} screenshot" class="screenshot" onerror="this.style.display='none'">
                                     `).join('')}
                                 </div>
                             </div>
@@ -125,7 +138,7 @@
                         </div>
                         <div class="app-footer">
                             <a href="${app.app_store_url || '#'}" class="app-store-button" target="_blank">
-                                <img src="images/app-store-badge.png" alt="Download on the App Store">
+                                <img src="images/app-store-badge.png" alt="Download on the App Store" onerror="this.style.display='none'">
                             </a>
                         </div>
                     `;
